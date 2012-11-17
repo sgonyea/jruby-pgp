@@ -8,21 +8,42 @@ describe PGP::Encryptor do
     let(:string) { "FooBar" }
     let(:encryptor) { PGP::Encryptor.new }
 
-    before {
-      encryptor.add_keys_from_file(public_key_path)
-    }
+    context 'When the Public Key is from a file' do
+      before {
+        encryptor.add_keys_from_file(public_key_path)
+      }
 
-    it "it's encrypted string should be decryptable. durr" do
-      encrypted_string = encryptor.encrypt(string, "some filename.txt")
+      it "it's encrypted string should be decryptable. durr" do
+        encrypted_string = encryptor.encrypt(string, "some filename.txt")
 
-      PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
-    end
+        PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
+      end
 
-    it "should not require that a filename be specified" do
-      encrypted_string = encryptor.encrypt(string)
+      it "should not require that a filename be specified" do
+        encrypted_string = encryptor.encrypt(string)
 
-      PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
-    end
-  end
+        PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
+      end
+    end # context 'When the Public Key is from a file'
+
+    context 'When the Public Key has been read in to memory' do
+      before {
+        encryptor.add_keys(File.read public_key_path)
+      }
+
+      it "it's encrypted string should be decryptable. durr" do
+        encrypted_string = encryptor.encrypt(string, "some filename.txt")
+
+        PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
+      end
+
+      it "should not require that a filename be specified" do
+        encrypted_string = encryptor.encrypt(string)
+
+        PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
+      end
+    end # context 'When the Public Key has been read in to memory'
+
+  end # describe '#encrypt'
 
 end
