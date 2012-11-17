@@ -16,7 +16,7 @@ Or install it yourself as:
 
     $ gem install jruby-pgp
 
-## Usage
+## Notes
 
 This gem currently features everything I need and nothing I don't. Pull requests are very much welcome;
 feature requests will be considered.
@@ -27,6 +27,13 @@ BC PGP APIs is certainly possible, but they are a pile of rocks. Using these API
 some unwanted bloat, especially when you're resource constrained:
 
 [Example using BC PGP directly from JRuby](https://gist.github.com/1954648)
+
+## Usage
+
+For usage examples, see the below test files:
+
+    Encryption: spec/lib/pgp/encryptor_spec.rb
+    Decryption: spec/lib/pgp/decryptor_spec.rb
 
 ## Contributing
 
