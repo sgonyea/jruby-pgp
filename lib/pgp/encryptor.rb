@@ -16,6 +16,14 @@ module PGP
       end
     end
 
+    def encrypt(cleartext, filename=nil)
+      name  = filename.to_s if filename
+      bytes = cleartext.to_java_bytes
+
+      encrypted_bytes   = encrypt_bytes(bytes, name)
+      encrypted_string  = String.from_java_bytes(encrypted_bytes)
+    end
+
     protected
     def keyring_from_file(filename)
       file = File.open(filename)

@@ -19,3 +19,4 @@ end
 task :default => %w(compile spec)
 
 task :build => :compile
+task :spec  => :compile

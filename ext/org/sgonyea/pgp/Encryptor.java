@@ -200,29 +200,29 @@ public class Encryptor {
    */
 
   /**
-   * This method preserves the much of the original API, so that you can just call the class method should you need to.
+   * This method preserves the much of the stolen API, so that you can just call the class method should you need to.
    */
-  public static byte[] encrypt(byte[] clearData, List<PGPPublicKey> publicKeys, String fileName, boolean withIntegrityCheck, boolean armor)
+  public static byte[] encryptBytes(byte[] clearData, List<PGPPublicKey> publicKeys, String fileName, boolean withIntegrityCheck, boolean armor)
     throws IOException, PGPException, NoSuchProviderException {
       Encryptor encryptor = new Encryptor(publicKeys);
 
-      return encryptor.encrypt(clearData, fileName);
+      return encryptor.encryptBytes(clearData, fileName);
   }
 
 
   /**
    * Encryption Instance Methods
    */
-  public byte[] encrypt(byte[] clearData, String fileName)
+  public byte[] encryptBytes(byte[] clearData, String fileName)
     throws IOException, PGPException, NoSuchProviderException {
-      return encrypt(clearData, fileName, new Date());
+      return encryptBytes(clearData, fileName, new Date());
   }
 
   /**
    * Allows you to override the modificationTime. This method was split off
    *  for mock-free testing of encrypted output.
    */
-  public byte[] encrypt(byte[] clearData, String fileName, Date modificationTime)
+  public byte[] encryptBytes(byte[] clearData, String fileName, Date modificationTime)
     throws IOException, PGPException, NoSuchProviderException {
       if (fileName == null)
         fileName = PGPLiteralData.CONSOLE;

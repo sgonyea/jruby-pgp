@@ -13,9 +13,15 @@ describe PGP::Encryptor do
     }
 
     it "it's encrypted string should be decryptable. durr" do
-      encrypted_string = encryptor.encrypt(string.to_java_bytes, "some filename")
+      encrypted_string = encryptor.encrypt(string, "some filename.txt")
 
-      PGP::Decryptor.decrypt(String.from_java_bytes(encrypted_string), private_key_path).should == string
+      PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
+    end
+
+    it "should not require that a filename be specified" do
+      encrypted_string = encryptor.encrypt(string)
+
+      PGP::Decryptor.decrypt(encrypted_string, private_key_path).should == string
     end
   end
 
