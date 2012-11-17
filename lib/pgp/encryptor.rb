@@ -16,11 +16,23 @@ module PGP
       name  = filename.to_s if filename
       bytes = cleartext.to_java_bytes
 
+      _encrypt(bytes, name)
+    end
+
+    # @todo: Create an encryptStream method and pass it the file handle
+    def encrypt_file(file_path)
+      name  = File.basename(file_path)
+      bytes = File.read(file_path).to_java_bytes
+
+      _encrypt(bytes, name)
+    end
+
+    protected
+    def _encrypt(bytes, name)
       encrypted_bytes   = encrypt_bytes(bytes, name)
       encrypted_string  = String.from_java_bytes(encrypted_bytes)
     end
 
-    protected
     def add_keys_from_enumerator(key_enumerator)
       key_enumerator.each do |pk_ring|
         pk_enumerator = pk_ring.get_public_keys

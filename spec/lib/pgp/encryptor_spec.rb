@@ -4,9 +4,10 @@ describe PGP::Encryptor do
   let(:private_key_path)  { Fixtures_Path.join('private_key.asc').to_s }
   let(:public_key_path)   { Fixtures_Path.join('public_key.asc').to_s }
 
+  let(:encryptor) { PGP::Encryptor.new }
+
   describe '#encrypt' do
     let(:string) { "FooBar" }
-    let(:encryptor) { PGP::Encryptor.new }
 
     context 'When the Public Key is from a file' do
       before {
@@ -45,5 +46,22 @@ describe PGP::Encryptor do
     end # context 'When the Public Key has been read in to memory'
 
   end # describe '#encrypt'
+
+  describe '#encrypt_file' do
+    let(:file_path) { Fixtures_Path.join('unencrypted_file.txt') }
+    let(:contents) { File.read(file_path) }
+
+    before {
+      encryptor.add_keys(File.read public_key_path)
+    }
+
+    pending "should have an encryptStream method to avoid memory bloat"
+
+    it "should encrypt a file" do
+      encrypted_file = encryptor.encrypt_file(file_path)
+
+      PGP::Decryptor.decrypt(encrypted_file, private_key_path).should == contents
+    end
+  end # describe '#encrypt_file'
 
 end
