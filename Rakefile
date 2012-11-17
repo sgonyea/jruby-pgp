@@ -12,6 +12,8 @@ Rake::JavaExtensionTask.new('jruby-pgp') do |ext|
   ext.classpath = jars.map { |x| File.expand_path x }.join ':'
 end
 
+RSpec::Core::RakeTask.new
+
 RSpec::Core::RakeTask.new(:rcov) do |task|
     task.rcov = true
 end

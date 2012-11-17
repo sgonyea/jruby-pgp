@@ -8,7 +8,8 @@ require 'pgp/encryptor'
 require 'pgp/private_key'
 
 module PGP
-  autoload :VERSION, 'pgp/version'
+  autoload :VERSION,        'pgp/version'
+  autoload :RubyDecryptor,  'pgp/ruby_decryptor'
 
   BC_Provider_Code = "BC"
 
