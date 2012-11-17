@@ -5,10 +5,19 @@ describe PGP::Encryptor do
   let(:public_key_path)   { Fixtures_Path.join('public_key.asc').to_s }
 
   let(:encryptor) { PGP::Encryptor.new }
+  let(:string) { "FooBar" }
+
+  describe '#initialize' do
+    let(:encryptor) { PGP::Encryptor.new(File.read public_key_path) }
+
+    it "should accept public key(s) as an argument" do
+      encrypted_string = encryptor.encrypt(string, "some filename.txt")
+
+      PGP::RubyDecryptor.decrypt(encrypted_string, private_key_path).should == string
+    end
+  end
 
   describe '#encrypt' do
-    let(:string) { "FooBar" }
-
     context 'When the Public Key is from a file' do
       before {
         encryptor.add_keys_from_file(public_key_path)

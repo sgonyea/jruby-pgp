@@ -2,6 +2,11 @@ module PGP
   class Encryptor < org.sgonyea.pgp.Encryptor
     include_package "org.bouncycastle.openpgp"
 
+    def initialize(key_string=nil)
+      super()
+      add_keys(key_string) if key_string
+    end
+
     def add_keys(key_string)
       key_enumerator = keyring_from_string(key_string).get_key_rings
       add_keys_from_enumerator(key_enumerator)
