@@ -23,8 +23,8 @@ feature requests will be considered.
 
 The general goal is to provide fast, non-terrible wrappers around the Bouncy Castle PGP APIs. Bare-metal
 JRuby code will then plug into those wrappers, to minimize memory bloat. Directly hooking JRuby into the
-BC PGP APIs is certainly possible, but they are a poorly designed pile of rocks. Using these APIs from
-JRuby can yield some unwanted bloat, especially when you're resource constrained:
+BC PGP APIs is certainly possible, but they are a pile of rocks. Using these APIs from JRuby can yield
+some unwanted bloat, especially when you're resource constrained:
 
 [Example using BC PGP directly from JRuby](https://gist.github.com/1954648)
 
