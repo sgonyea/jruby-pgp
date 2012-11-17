@@ -46,9 +46,12 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 
 public class Encryptor {
   private List<PGPPublicKey> _publicKeys;
+  private List<BcPublicKeyKeyEncryptionMethodGenerator> _publicKeyEMGs;
   private boolean _integrityCheck;
   private boolean _asciiArmor;
   private char    _format;
@@ -56,6 +59,7 @@ public class Encryptor {
 
   private void init() {
     _publicKeys     = new ArrayList<PGPPublicKey>();
+    _publicKeyEMGs  = new ArrayList<BcPublicKeyKeyEncryptionMethodGenerator>();
     _integrityCheck = true;
     _asciiArmor     = true;
 
@@ -103,6 +107,9 @@ public class Encryptor {
   /* publicKeys */
   public void setPublicKeys(List<PGPPublicKey> publicKeys) {
     _publicKeys = publicKeys;
+
+    clearPublicKeyEMGs();
+    addToPublicKeyEMG(publicKeys);
   }
 
   public List<PGPPublicKey> getPublicKeys() {
@@ -111,10 +118,32 @@ public class Encryptor {
 
   public void addPublicKey(PGPPublicKey publicKey) {
     _publicKeys.add(publicKey);
+    addToPublicKeyEMG(publicKey);
   }
 
   public void addPublicKeys(List<PGPPublicKey> publicKeys) {
     _publicKeys.addAll(publicKeys);
+
+    addToPublicKeyEMG(publicKeys);
+  }
+
+  /* publicKeyEMGs */
+  public List<BcPublicKeyKeyEncryptionMethodGenerator> getPublicKeyEMGs() {
+    return _publicKeyEMGs;
+  }
+
+  public void clearPublicKeyEMGs() {
+    _publicKeyEMGs = new ArrayList<BcPublicKeyKeyEncryptionMethodGenerator>();
+  }
+
+  public void addToPublicKeyEMG(PGPPublicKey publicKey) {
+    _publicKeyEMGs.add(new BcPublicKeyKeyEncryptionMethodGenerator(publicKey));
+  }
+
+  public void addToPublicKeyEMG(List<PGPPublicKey> publicKeys) {
+    for(PGPPublicKey publicKey : publicKeys) {
+      addToPublicKeyEMG(publicKey);
+    }
   }
 
   /* format */
@@ -203,52 +232,67 @@ public class Encryptor {
       if (fileName == null)
         fileName = PGPLiteralData.CONSOLE;
 
-      ByteArrayOutputStream encryptedOutput = new ByteArrayOutputStream();
-      OutputStream output = encryptedOutput;
+      PGPEncryptedDataGenerator   pgpDataGenerator        = newPGPDataGenerator();
+      PGPLiteralDataGenerator     dataGenerator           = new PGPLiteralDataGenerator();
+      PGPCompressedDataGenerator  compressedDataGenerator = new PGPCompressedDataGenerator(getCompression());
 
+      ByteArrayOutputStream   compressedOutput  = new ByteArrayOutputStream();
+      ByteArrayOutputStream   encryptedOutput   = new ByteArrayOutputStream();
+
+      OutputStream  compressedDataStream  = compressedDataGenerator.open(compressedOutput); // open it with the final
+      OutputStream  output                = encryptedOutput;
+      OutputStream  compressorStream;
+      OutputStream  encryptorStream;
+
+      byte[] compressedBytes;
+
+      // Step 1: Compress the data
+      compressorStream = dataGenerator.open(
+        compressedDataStream, // the compressed output stream
+        getFormat(),
+        fileName,             // "filename" to store
+        clearData.length,     // length of clear data
+        modificationTime      // current time
+      );
+      compressorStream.write(clearData);
+
+      dataGenerator.close();
+      compressedDataGenerator.close();
+
+      compressedBytes = compressedOutput.toByteArray();
+
+
+      // Step 2: ASCII Armor the data if desired
+      output = encryptedOutput;
       if (getAsciiArmor())
         output = new ArmoredOutputStream(output);
 
-      ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-      PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(getCompression());
-      OutputStream cos = comData.open(bOut); // open it with the final
-      // destination
-      PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
-
-      // we want to generate compressed data. This might be a user option
-      // later,
-      // in which case we would pass in bOut.
-      OutputStream pOut = lData.open(
-              cos,              // the compressed output stream
-              getFormat(),
-              fileName,         // "filename" to store
-              clearData.length, // length of clear data
-              modificationTime  // current time
-              );
-      pOut.write(clearData);
-
-      lData.close();
-      comData.close();
-
-      PGPEncryptedDataGenerator cPk = new PGPEncryptedDataGenerator(
-              PGPEncryptedData.CAST5, getIntegrityCheck(), new SecureRandom(),
-              "BC");
-
-      for(PGPPublicKey publicKey : getPublicKeys()) {
-        cPk.addMethod(publicKey);
-      }
-
-      byte[] bytes = bOut.toByteArray();
-
-      OutputStream cOut = cPk.open(output, bytes.length);
-
-      cOut.write(bytes); // obtain the actual bytes from the compressed stream
-
-      cOut.close();
+      // Step 3: Encrypt the data
+      encryptorStream = pgpDataGenerator.open(output, compressedBytes.length);
+      encryptorStream.write(compressedBytes);
+      encryptorStream.close();
 
       output.close();
 
+      // Return the data as a byte array
       return encryptedOutput.toByteArray();
+  }
+
+  public PGPEncryptedDataGenerator newPGPDataGenerator() {
+    PGPEncryptedDataGenerator generator;
+    BcPGPDataEncryptorBuilder builder;
+
+    builder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
+    builder.setWithIntegrityPacket(getIntegrityCheck());
+
+    generator = new PGPEncryptedDataGenerator(builder);
+
+    // Add all our public keys to the Data Generator
+    for(BcPublicKeyKeyEncryptionMethodGenerator fml : getPublicKeyEMGs()) {
+      generator.addMethod(fml);
+    }
+
+    return generator;
   }
 }
