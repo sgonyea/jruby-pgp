@@ -44,6 +44,6 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPUtil;
 
-public class PGP {
+public class Decryptor {
 
 }
