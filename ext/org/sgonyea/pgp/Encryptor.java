@@ -56,6 +56,7 @@ public class Encryptor {
   private boolean _asciiArmor;
   private char    _format;
   private int     _compression;
+  private int     _algorithm;
 
   private void init() {
     _publicKeys     = new ArrayList<PGPPublicKey>();
@@ -65,6 +66,8 @@ public class Encryptor {
 
     useBinaryFormat();
     useZIPCompression();
+
+    _algorithm = PGPEncryptedData.CAST5;
   }
 
   public Encryptor() {
@@ -147,57 +150,49 @@ public class Encryptor {
   }
 
   /* format */
-  public void setFormat(char format) {
-    switch(format) {
-      case PGPLiteralData.BINARY:
-      case PGPLiteralData.TEXT:
-      case PGPLiteralData.UTF8:   _format = format;
-                                  break;
-      default:
-        throw new IllegalArgumentException("Invalid format. Acceptable formats: 'b', 't', or 'u' (respectively: binary, text, or utf8)");
-    }
-  }
-
   public char getFormat() {
     return _format;
   }
 
-  public void useBinaryFormat() {
-    setFormat(PGPLiteralData.BINARY);
+  public void setFormat(char format) {
+    switch(format) {
+      case PGPLiteralData.BINARY:
+      case PGPLiteralData.TEXT:
+      case PGPLiteralData.UTF8:   _format = format; break;
+      default:
+        throw new IllegalArgumentException("Invalid format. Acceptable formats: 'b', 't', or 'u' (respectively: binary, text, or utf8)");
+    }
   }
-
-  public void useTextFormat() {
-    setFormat(PGPLiteralData.TEXT);
-  }
-
-  public void useUTF8Format() {
-    setFormat(PGPLiteralData.UTF8);
-  }
+  public void useBinaryFormat() { setFormat(PGPLiteralData.BINARY); }
+  public void useTextFormat()   { setFormat(PGPLiteralData.TEXT);   }
+  public void useUTF8Format()   { setFormat(PGPLiteralData.UTF8);   }
 
   /* compression */
-  public void setCompression(int compression) {
-    _compression = compression;
-  }
-
   public int getCompression() {
     return _compression;
   }
 
-  public void useNoCompression() {
-    setCompression(CompressionAlgorithmTags.UNCOMPRESSED);
+  public void setCompression(int compression) {
+    _compression = compression;
+  }
+  public void useNoCompression()    { setCompression(CompressionAlgorithmTags.UNCOMPRESSED); }
+  public void useZIPCompression()   { setCompression(CompressionAlgorithmTags.ZIP);   }
+  public void useZLIBCompression()  { setCompression(CompressionAlgorithmTags.ZLIB);  }
+  public void useBZIP2Compression() { setCompression(CompressionAlgorithmTags.BZIP2); }
+
+  /* algorithm */
+  public int getAlgorithm() {
+    return _algorithm;
   }
 
-  public void useZIPCompression() {
-    setCompression(CompressionAlgorithmTags.ZIP);
+  /**
+   * @see org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags
+   */
+  public void setAlgorithm(int algorithm) {
+    _algorithm = algorithm;
   }
 
-  public void useZLIBCompression() {
-    setCompression(CompressionAlgorithmTags.ZLIB);
-  }
-
-  public void useBZIP2Compression() {
-    setCompression(CompressionAlgorithmTags.BZIP2);
-  }
+  /** End Accessor Methods **/
 
 
   /**
@@ -283,7 +278,7 @@ public class Encryptor {
     PGPEncryptedDataGenerator generator;
     BcPGPDataEncryptorBuilder builder;
 
-    builder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
+    builder = new BcPGPDataEncryptorBuilder(getAlgorithm());
     builder.setWithIntegrityPacket(getIntegrityCheck());
 
     generator = new PGPEncryptedDataGenerator(builder);
