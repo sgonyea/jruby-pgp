@@ -1,5 +1,5 @@
 module PGP
-  class Encryptor
+  class Encryptor < org.sgonyea.pgp.Encryptor
 
 
 
