@@ -6,7 +6,7 @@
  *  https://gist.github.com/1954648
  *
  * Thanks to everyone who has posted on the topic of Bouncy Castle's PGP Library.
- */
+**/
 
 package org.sgonyea.pgp;
 
@@ -87,7 +87,7 @@ public class Encryptor {
 
   /**
    * Accessor and Attribute Helper Methods
-   */
+  **/
 
   /* integrityCheck */
   public void setIntegrityCheck(boolean integrityCheck) {
@@ -187,7 +187,7 @@ public class Encryptor {
 
   /**
    * @see org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags
-   */
+  **/
   public void setAlgorithm(int algorithm) {
     _algorithm = algorithm;
   }
@@ -197,11 +197,11 @@ public class Encryptor {
 
   /**
    * Encryption Class / Static Methods
-   */
+  **/
 
   /**
    * This method preserves the much of the stolen API, so that you can just call the class method should you need to.
-   */
+  **/
   public static byte[] encryptBytes(byte[] clearData, List<PGPPublicKey> publicKeys, String fileName, boolean withIntegrityCheck, boolean armor)
     throws IOException, PGPException, NoSuchProviderException {
       Encryptor encryptor = new Encryptor(publicKeys);
@@ -212,7 +212,7 @@ public class Encryptor {
 
   /**
    * Encryption Instance Methods
-   */
+  **/
   public byte[] encryptBytes(byte[] clearData, String fileName)
     throws IOException, PGPException, NoSuchProviderException {
       return encryptBytes(clearData, fileName, new Date());
@@ -221,7 +221,7 @@ public class Encryptor {
   /**
    * Allows you to override the modificationTime. This method was split off
    *  for mock-free testing of encrypted output.
-   */
+  **/
   public byte[] encryptBytes(byte[] clearData, String fileName, Date modificationTime)
     throws IOException, PGPException, NoSuchProviderException {
       if (fileName == null)
