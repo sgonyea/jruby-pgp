@@ -6,7 +6,6 @@ require 'pgp/jruby-pgp.jar'
 require 'pgp/decryptor'
 require 'pgp/encryptor'
 require 'pgp/private_key'
-require 'pgp/public_key'
 
 module PGP
   autoload :VERSION, 'pgp/version'

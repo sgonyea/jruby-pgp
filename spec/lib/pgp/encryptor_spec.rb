@@ -4,15 +4,12 @@ describe PGP::Encryptor do
   let(:private_key_path)  { Fixtures_Path.join('private_key.asc').to_s }
   let(:public_key_path)   { Fixtures_Path.join('public_key.asc').to_s }
 
-  let(:public_key)  { PGP::PublicKey.from_file(public_key_path) }
-  # let(:private_key) { PGP::PrivateKey.from_file(public_key_path) }
-
   describe '#encrypt' do
     let(:string) { "FooBar" }
     let(:encryptor) { PGP::Encryptor.new }
 
     before {
-      encryptor.add_public_key(public_key)
+      encryptor.add_keys_from_file(public_key_path)
     }
 
     it "it's encrypted string should be decryptable. durr" do
