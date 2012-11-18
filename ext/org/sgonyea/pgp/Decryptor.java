@@ -46,4 +46,99 @@ import org.bouncycastle.openpgp.PGPUtil;
 
 public class Decryptor {
 
+  private PGPSecretKeyRingCollection _privateKeys;
+
+  public Decryptor() { }
+  public Decryptor(PGPSecretKeyRingCollection privateKeys) {
+    setPrivateKeys(privateKeys);
+  }
+
+  /**
+   * Accessor and Attribute Helper Methods
+  **/
+  public PGPSecretKeyRingCollection getPrivateKeys() {
+    return _privateKeys;
+  }
+
+  public void setPrivateKeys(PGPSecretKeyRingCollection privateKeys) {
+    _privateKeys = privateKeys;
+  }
+
+  public PGPPrivateKey findPrivateKey(long keyID)
+    throws PGPException, NoSuchProviderException {
+      PGPSecretKey pgpSecKey = getPrivateKeys().getSecretKey(keyID);
+
+      if (pgpSecKey == null)
+        return null;
+
+      // null = the password. We won't need this for now.
+      return pgpSecKey.extractPrivateKey(null, "BC");
+  }
+
+  /** End Accessor Methods **/
+
+  /**
+   * Decryption Instance Methods
+  **/
+
+  public byte[] decryptBytes(byte[] encryptedBytes)
+    throws IOException, PGPException, NoSuchProviderException {
+      InputStream stream = new ByteArrayInputStream(encryptedBytes);
+      return decryptStream(stream);
+  }
+
+  public byte[] decryptStream(InputStream encryptedStream)
+    throws IOException, PGPException, NoSuchProviderException {
+
+      InputStream decoderStream = PGPUtil.getDecoderStream(encryptedStream);
+
+      PGPObjectFactory pgpF = new PGPObjectFactory(decoderStream);
+      PGPEncryptedDataList enc = null;
+      Object o = pgpF.nextObject();
+
+      // the first object might be a PGP marker packet.
+      if (o instanceof PGPEncryptedDataList)
+        enc = (PGPEncryptedDataList) o;
+      else
+        enc = (PGPEncryptedDataList) pgpF.nextObject();
+
+      Iterator it = enc.getEncryptedDataObjects();
+      PGPPublicKeyEncryptedData pbe = null;
+
+      PGPPrivateKey secretKey = null;
+
+      while (secretKey == null && it.hasNext()) {
+        pbe = (PGPPublicKeyEncryptedData) it.next();
+
+        secretKey = findPrivateKey(pbe.getKeyID());
+      }
+
+      if (secretKey == null)
+        throw new IllegalArgumentException("secret key for message not found.");
+
+      InputStream clear = pbe.getDataStream(secretKey, "BC");
+
+      PGPObjectFactory pgpFact = new PGPObjectFactory(clear);
+
+      PGPCompressedData cData = (PGPCompressedData) pgpFact.nextObject();
+
+      pgpFact = new PGPObjectFactory(cData.getDataStream());
+
+      PGPLiteralData ld = (PGPLiteralData) pgpFact.nextObject();
+
+      InputStream unc = ld.getInputStream();
+
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      int ch;
+
+      while ((ch = unc.read()) >= 0) {
+          out.write(ch);
+
+      }
+
+      byte[] returnBytes = out.toByteArray();
+      out.close();
+      return returnBytes;
+  }
+
 }
