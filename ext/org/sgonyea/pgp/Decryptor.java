@@ -98,6 +98,12 @@ public class Decryptor {
       Iterator encryptedDataIterator;
       PGPPublicKeyEncryptedData publicKeyData = null;
       PGPPrivateKey privateKey = null;
+      InputStream decryptedDataStream;
+      PGPObjectFactory pgpFactory;
+      PGPCompressedData compressedData;
+      PGPLiteralData literallyTheRealFuckingData;
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      byte[] returnBytes;
 
       // the first object might be a PGP marker packet.
       if (encryptedObj instanceof PGPEncryptedDataList)
@@ -116,28 +122,25 @@ public class Decryptor {
       if (privateKey == null)
         throw new IllegalArgumentException("secret key for message not found.");
 
-      InputStream clear = publicKeyData.getDataStream(privateKey, "BC");
+      decryptedDataStream = publicKeyData.getDataStream(privateKey, "BC");
 
-      PGPObjectFactory pgpFact = new PGPObjectFactory(clear);
+      pgpFactory = new PGPObjectFactory(decryptedDataStream);
 
-      PGPCompressedData cData = (PGPCompressedData) pgpFact.nextObject();
+      compressedData = (PGPCompressedData) pgpFactory.nextObject();
 
-      pgpFact = new PGPObjectFactory(cData.getDataStream());
+      pgpFactory = new PGPObjectFactory(compressedData.getDataStream());
 
-      PGPLiteralData ld = (PGPLiteralData) pgpFact.nextObject();
+      literallyTheRealFuckingData = (PGPLiteralData) pgpFactory.nextObject();
 
-      InputStream unc = ld.getInputStream();
+      decryptedDataStream = literallyTheRealFuckingData.getInputStream();
 
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
       int ch;
+      while ((ch = decryptedDataStream.read()) >= 0)
+        outputStream.write(ch);
 
-      while ((ch = unc.read()) >= 0) {
-          out.write(ch);
+      returnBytes = outputStream.toByteArray();
+      outputStream.close();
 
-      }
-
-      byte[] returnBytes = out.toByteArray();
-      out.close();
       return returnBytes;
   }
 
