@@ -93,30 +93,30 @@ public class Decryptor {
       InputStream decoderStream = PGPUtil.getDecoderStream(encryptedStream);
 
       PGPObjectFactory pgpF = new PGPObjectFactory(decoderStream);
-      PGPEncryptedDataList enc = null;
-      Object o = pgpF.nextObject();
+      PGPEncryptedDataList encryptedData = null;
+      Object encryptedObj = pgpF.nextObject();
+      Iterator encryptedDataIterator;
+      PGPPublicKeyEncryptedData publicKeyData = null;
+      PGPPrivateKey privateKey = null;
 
       // the first object might be a PGP marker packet.
-      if (o instanceof PGPEncryptedDataList)
-        enc = (PGPEncryptedDataList) o;
+      if (encryptedObj instanceof PGPEncryptedDataList)
+        encryptedData = (PGPEncryptedDataList) encryptedObj;
       else
-        enc = (PGPEncryptedDataList) pgpF.nextObject();
+        encryptedData = (PGPEncryptedDataList) pgpF.nextObject();
 
-      Iterator it = enc.getEncryptedDataObjects();
-      PGPPublicKeyEncryptedData pbe = null;
+      encryptedDataIterator = encryptedData.getEncryptedDataObjects();
 
-      PGPPrivateKey secretKey = null;
+      while (privateKey == null && encryptedDataIterator.hasNext()) {
+        publicKeyData = (PGPPublicKeyEncryptedData) encryptedDataIterator.next();
 
-      while (secretKey == null && it.hasNext()) {
-        pbe = (PGPPublicKeyEncryptedData) it.next();
-
-        secretKey = findPrivateKey(pbe.getKeyID());
+        privateKey = findPrivateKey(publicKeyData.getKeyID());
       }
 
-      if (secretKey == null)
+      if (privateKey == null)
         throw new IllegalArgumentException("secret key for message not found.");
 
-      InputStream clear = pbe.getDataStream(secretKey, "BC");
+      InputStream clear = publicKeyData.getDataStream(privateKey, "BC");
 
       PGPObjectFactory pgpFact = new PGPObjectFactory(clear);
 
