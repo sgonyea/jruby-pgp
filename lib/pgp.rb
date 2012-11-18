@@ -1,5 +1,5 @@
 require 'java'
-require 'pgp/jars/bcprov-jdk15on-147.jar'
+require 'pgp/jars/bcprov-jdk15on-147.jar' if JRUBY_VERSION < '1.7'
 require 'pgp/jars/bcpg-jdk15on-147.jar'
 require 'pgp/jruby-pgp.jar'
 
