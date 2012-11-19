@@ -1,6 +1,7 @@
 # PGP
 
-This is a Java + JRuby wrapper around the Bouncy Castle PGP APIs.
+This is a Java + JRuby wrapper around the Bouncy Castle PGP APIs. The goal is to write
+anything that is memory / object intensive in Java. Use JRuby for everything else.
 
 ## Installation
 
@@ -16,10 +17,36 @@ Or install it yourself as:
 
     $ gem install jruby-pgp
 
+## Feature Support:
+
+The feature set is very bare, and restricted to the following operations:
+
+- Encrypt a file to a known list of Public Key(s).
+
+- Decrypt a file using a given set of Private Key(s).
+
+- Public and Private keys may be read in from disk or from memory.
+
+Currently, you **cannot** do the following:
+
+- Create new Private Keys / generate public keys from a given Private Key.
+
+- Sign a file that you are encrypting.
+
+- Verify the signature of a file that you are decrypting.
+
+- Use password-protected Private Keys. (This is a trivial change that can later be added.)
+
+- Obtain the name of the file that was encrypted. (Should be an easy feature to add.)
+
+- Obtain the "modificationTime" (timestamp) of the encrypted data / file.
+
 ## Notes
 
 This gem currently features everything I need and nothing I don't. Pull requests are very much welcome;
-feature requests will be considered.
+feature requests will be considered. You may also find examples for certain operations, using the
+Bouncy Castle PGP APIs, and link to them in an Issue. That would make their implementation (by me) far
+more likely to happen.
 
 The general goal is to provide fast, non-terrible wrappers around the Bouncy Castle PGP APIs. Bare-metal
 JRuby code will then plug into those wrappers, to minimize memory bloat. Directly hooking JRuby into the
