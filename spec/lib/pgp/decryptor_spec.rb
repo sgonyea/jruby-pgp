@@ -13,12 +13,11 @@ describe PGP::Decryptor do
 
   describe '#decrypt' do
     before {
-      keyring = PGP::PrivateKey.send(:keyring_from_file, private_key_path)
-      decryptor.private_keys = keyring
+      decryptor.add_keys_from_file(private_key_path)
     }
 
     it "should successfully decrypt an encrypted file" do
-      String.from_java_bytes(decryptor.decrypt_stream(PGP.string_to_bais encrypted_text)).should == unencrypted_text
+      decryptor.decrypt(encrypted_text).should == unencrypted_text
     end
   end
 end

@@ -19,7 +19,6 @@ module PGP
       sec_key.extract_private_key(nil, BC_Provider_Code) if sec_key
     end
 
-    protected
     def self.keyring_from_file(filename)
       file = File.open(filename)
       keyring_from_stream(file.to_inputstream)
