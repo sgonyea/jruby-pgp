@@ -66,8 +66,7 @@ public class Encryptor {
 
     useBinaryFormat();
     useZIPCompression();
-
-    _algorithm = PGPEncryptedData.CAST5;
+    useCAST5Algorithm();
   }
 
   public Encryptor() {
@@ -185,12 +184,19 @@ public class Encryptor {
     return _algorithm;
   }
 
-  /**
-   * @see org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags
-  **/
   public void setAlgorithm(int algorithm) {
     _algorithm = algorithm;
   }
+  public void useIDEAAlgorithm()      { setAlgorithm(PGPEncryptedData.IDEA);      }
+  public void useTripleDESAlgorithm() { setAlgorithm(PGPEncryptedData.TRIPLE_DES);}
+  public void useCAST5Algorithm()     { setAlgorithm(PGPEncryptedData.CAST5);     }
+  public void useBlowfishAlgorithm()  { setAlgorithm(PGPEncryptedData.BLOWFISH);  }
+  public void useSaferAlgorithm()     { setAlgorithm(PGPEncryptedData.SAFER);     }
+  public void useDESAlgorithm()       { setAlgorithm(PGPEncryptedData.DES);       }
+  public void useAES128Algorithm()    { setAlgorithm(PGPEncryptedData.AES_128);   }
+  public void useAES192Algorithm()    { setAlgorithm(PGPEncryptedData.AES_192);   }
+  public void useAES256Algorithm()    { setAlgorithm(PGPEncryptedData.AES_256);   }
+  public void useTwoFishAlgorithm()   { setAlgorithm(PGPEncryptedData.TWOFISH);   }
 
   /** End Accessor Methods **/
 
