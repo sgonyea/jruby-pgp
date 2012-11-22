@@ -22,4 +22,10 @@ module PGP
   def self.string_to_bais(string)
     ByteArrayInputStream.new string.to_java_bytes
   end
+
+  # This exists for stubbing during tests
+  def self.time_now
+    Time.now
+  end
+
 end

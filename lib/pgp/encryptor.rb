@@ -17,24 +17,24 @@ module PGP
       add_keys_from_enumerator(key_enumerator)
     end
 
-    def encrypt(cleartext, filename=nil)
-      name  = filename.to_s if filename
-      bytes = cleartext.to_java_bytes
+    def encrypt(cleartext, filename=nil, mtime=nil)
+      name    = filename.to_s if filename
+      bytes   = cleartext.to_java_bytes
+      mtime ||= PGP.time_now
 
-      _encrypt(bytes, name)
+      _encrypt(bytes, name, mtime)
     end
 
-    # @todo: Create an encryptStream method and pass it the file handle
     def encrypt_file(file_path)
       name  = File.basename(file_path)
       bytes = File.read(file_path).to_java_bytes
 
-      _encrypt(bytes, name)
+      _encrypt(bytes, name, File.mtime(file_path))
     end
 
     protected
-    def _encrypt(bytes, name)
-      encrypted_bytes   = encrypt_bytes(bytes, name)
+    def _encrypt(bytes, name, modification_time=nil)
+      encrypted_bytes   = encrypt_bytes(bytes, name, modification_time)
       encrypted_string  = String.from_java_bytes(encrypted_bytes)
     end
 
