@@ -233,6 +233,9 @@ public class Encryptor {
       if (fileName == null)
         fileName = PGPLiteralData.CONSOLE;
 
+      if (modificationTime == null)
+        modificationTime = new Date();
+
       PGPEncryptedDataGenerator   pgpDataGenerator        = newPGPDataGenerator();
       PGPLiteralDataGenerator     dataGenerator           = new PGPLiteralDataGenerator();
       PGPCompressedDataGenerator  compressedDataGenerator = new PGPCompressedDataGenerator(getCompression());
