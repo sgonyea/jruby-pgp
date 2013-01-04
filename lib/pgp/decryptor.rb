@@ -16,6 +16,10 @@ module PGP
       String.from_java_bytes(decrypted_data)
     end
 
+    def decrypt_file(file_path)
+      decrypt File.read(file_path)
+    end
+
     protected
     def keyring_from_file(filename)
       file = File.open(filename)
