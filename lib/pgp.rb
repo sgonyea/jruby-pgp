@@ -10,6 +10,7 @@ require 'pgp/private_key'
 module PGP
   autoload :VERSION,        'pgp/version'
   autoload :RubyDecryptor,  'pgp/ruby_decryptor'
+  autoload :CLI,            'pgp/cli'
 
   BC_Provider_Code = "BC"
 

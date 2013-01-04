@@ -1,0 +1,12 @@
+#!/usr/bin/env jruby
+
+if $LOAD_PATH.grep('jruby-pgp').none?
+  lib_dir = File.expand_path('../../lib', __FILE__)
+  $LOAD_PATH.unshift lib_dir
+end
+
+require 'pgp/cli/runner'
+require 'pathname'
+require 'optparse'
+
+PGP::CLI::Runner.go!(ARGV)
