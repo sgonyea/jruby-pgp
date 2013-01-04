@@ -27,7 +27,9 @@ The feature set is very bare, and restricted to the following operations:
 
 - Public and Private keys may be read in from disk or from memory.
 
-Currently, you **cannot** do the following:
+Currently, you **cannot** do the following (These are TODO items):
+
+- Verify any signatures of public / private keys.
 
 - Create new Private Keys / generate public keys from a given Private Key.
 
