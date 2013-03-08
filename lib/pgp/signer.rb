@@ -11,8 +11,7 @@ module PGP
     end
 
     def sign(data)
-      input_stream    = PGP.string_to_bais(data)
-      signed_data  = sign_stream(input_stream)
+      signed_data  = sign_data(data.to_java_bytes)
       String.from_java_bytes(signed_data)
     end
 

@@ -80,8 +80,7 @@ public class Signer {
     throw new IllegalArgumentException("Can't find signing key in key ring.");
   }
 
-
-  public byte[] signStream(InputStream inStream)
+  public byte[] signData(byte[] clearData)
     throws Exception {
       String fileName = "something.txt";
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -111,14 +110,13 @@ public class Signer {
 
       File                        file = new File(fileName);
       PGPLiteralDataGenerator     lGen = new PGPLiteralDataGenerator();
-      OutputStream                lOut = lGen.open(bOut, PGPLiteralData.BINARY, file);
+      OutputStream                lOut = lGen.open(bOut,
+        PGPLiteralData.BINARY, PGPLiteralDataGenerator.CONSOLE,
+        clearData.length, PGPLiteralDataGenerator.NOW);
       int                         ch;
 
-      while ((ch = inStream.read()) >= 0)
-      {
-          lOut.write(ch);
-          sGen.update((byte)ch);
-      }
+      lOut.write(clearData);
+      sGen.update(clearData);
 
       lGen.close();
 
@@ -126,7 +124,8 @@ public class Signer {
 
       cGen.close();
 
-      System.out.println(bos.toString());
+      out.close();
+
       return bos.toByteArray();
   }
 

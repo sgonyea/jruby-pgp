@@ -29,15 +29,4 @@ describe PGP::Signer do
 
   end
 
-  describe "SignedFileProcessor" do
-    # include_package "org.bouncycastle.openpgp"
-    include_package "org.sgonyea.pgp"
-
-    it "should sign stuff" do
-      signed = org.sgonyea.pgp.SignedFileProcessor.sign_file unsigned_file.to_s, java.io.FileInputStream.new(private_key_path), "testingpgp", true
-      verifier.verify(signed).should == unsigned_data
-    end
-
-  end
-
 end
