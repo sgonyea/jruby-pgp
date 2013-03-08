@@ -6,6 +6,7 @@ require 'pgp/jruby-pgp.jar'
 require 'pgp/decryptor'
 require 'pgp/encryptor'
 require 'pgp/verifier'
+require 'pgp/signer'
 require 'pgp/private_key'
 
 module PGP
