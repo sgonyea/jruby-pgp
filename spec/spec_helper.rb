@@ -1,7 +1,5 @@
-require 'bundler/setup'
-
-Bundler.require :development, :test
-
+require 'rspec'
+require 'bundler'
 require 'jruby-pgp'
 
 Fixtures_Path = Bundler.root + 'spec/support/fixtures/'
