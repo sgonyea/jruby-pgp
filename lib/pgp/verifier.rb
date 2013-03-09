@@ -11,8 +11,8 @@ module PGP
     end
 
     def verify(signed_data)
-      input_stream    = PGP.string_to_bais(signed_data)
-      verified_data  = verify_stream(input_stream)
+      input_stream  = PGP.string_to_bais(signed_data)
+      verified_data = verify_stream(input_stream)
       String.from_java_bytes(verified_data)
     end
 

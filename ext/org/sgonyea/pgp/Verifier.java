@@ -10,6 +10,8 @@
 
 package org.sgonyea.pgp;
 
+import org.sgonyea.pgp.VerificationFailedException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,7 +52,7 @@ public class Verifier {
 
 
   public byte[] verifyStream(InputStream inStream)
-    throws Exception
+    throws Exception, VerificationFailedException
   {
     InputStream in = PGPUtil.getDecoderStream(inStream);
 
@@ -72,6 +74,10 @@ public class Verifier {
     PGPPublicKey                key = _publicKeys.getPublicKey(ops.getKeyID());
     ByteArrayOutputStream       out = new ByteArrayOutputStream();
 
+    if(key == null) {
+      throw new VerificationFailedException("Error: Signature could not be verified.");
+    }
+
     ops.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"), key);
 
     while ((ch = dIn.read()) >= 0)
@@ -84,14 +90,10 @@ public class Verifier {
 
     PGPSignatureList            p3 = (PGPSignatureList)pgpFact.nextObject();
 
-    if (ops.verify(p3.get(0)))
-    {
-        System.out.println("signature verified.");
+    if (!ops.verify(p3.get(0))) {
+      throw new VerificationFailedException("Error: Signature could not be verified.");
     }
-    else
-    {
-        System.out.println("signature verification failed.");
-    }
+
     byte[] returnBytes = out.toByteArray();
     out.close();
 
