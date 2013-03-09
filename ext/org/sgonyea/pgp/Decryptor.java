@@ -48,6 +48,8 @@ public class Decryptor {
 
   private PGPSecretKeyRingCollection _privateKeys;
 
+  private String passphrase;
+
   public Decryptor() { }
   public Decryptor(PGPSecretKeyRingCollection privateKeys) {
     setPrivateKeys(privateKeys);
@@ -64,6 +66,10 @@ public class Decryptor {
     _privateKeys = privateKeys;
   }
 
+  public void setPassphrase(String passphrase) {
+    this.passphrase = passphrase;
+  }
+
   public PGPPrivateKey findPrivateKey(long keyID)
     throws PGPException, NoSuchProviderException {
       PGPSecretKey pgpSecKey = getPrivateKeys().getSecretKey(keyID);
@@ -71,8 +77,7 @@ public class Decryptor {
       if (pgpSecKey == null)
         return null;
 
-      // null = the password. We won't need this for now.
-      return pgpSecKey.extractPrivateKey(null, "BC");
+      return pgpSecKey.extractPrivateKey((passphrase == null ? null : passphrase.toCharArray()), "BC");
   }
 
   /** End Accessor Methods **/
