@@ -27,6 +27,12 @@ The feature set is very bare, and restricted to the following operations:
 
 - Public and Private keys may be read in from disk or from memory.
 
+- Verify the signature of a file that you are decrypting. (thanks, @superchris)
+
+- Use password-protected Private Keys. (thanks, @superchris)
+
+- Sign a file from the file system. (thanks, @superchris)
+
 Currently, you **cannot** do the following (These are TODO items):
 
 - Verify any signatures of public / private keys.
@@ -35,13 +41,11 @@ Currently, you **cannot** do the following (These are TODO items):
 
 - Sign a file that you are encrypting.
 
-- Verify the signature of a file that you are decrypting.
-
-- Use password-protected Private Keys. (This is a trivial change that can later be added.)
-
 - Obtain the name of the file that was encrypted. (Should be an easy feature to add.)
 
 - Obtain the "modificationTime" (timestamp) of the encrypted data / file.
+
+- Verify a public key based on information from a key server.
 
 ## Notes
 
@@ -64,6 +68,10 @@ For usage examples, see the below test files:
     Encryption: spec/lib/pgp/encryptor_spec.rb
     Decryption: spec/lib/pgp/decryptor_spec.rb
 
+## Contributors
+
+@superchris
+
 ## Contributing
 
 1. Fork it
@@ -71,3 +79,11 @@ For usage examples, see the below test files:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Testing:
+
+Just run:
+
+    $ rake spec
+
+And it will compile the Java extensions prior to running the tests.
