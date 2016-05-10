@@ -15,11 +15,24 @@ import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.bc.BcPGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
+import org.bouncycastle.openpgp.jcajce.JcaPGPSecretKeyRingCollection;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
+import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.PGPContentVerifierBuilderProvider;
+import org.bouncycastle.openpgp.operator.PGPDigestCalculatorProvider;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
+import org.bouncycastle.openpgp.operator.PublicKeyDataDecryptorFactory;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
 
 class PGPExampleUtil
 {
@@ -54,7 +67,15 @@ class PGPExampleUtil
             return null;
         }
 
-        return pgpSecKey.extractPrivateKey(pass, "BC");
+        PGPDigestCalculatorProvider calcProvider = new JcaPGPDigestCalculatorProviderBuilder().
+          setProvider(BouncyCastleProvider.PROVIDER_NAME).
+          build();
+
+        PBESecretKeyDecryptor decryptor = new JcePBESecretKeyDecryptorBuilder(calcProvider).
+          setProvider(BouncyCastleProvider.PROVIDER_NAME).
+          build(pass);
+
+        return pgpSecKey.extractPrivateKey(decryptor);
     }
 
     static PGPPublicKey readPublicKey(String fileName) throws IOException, PGPException
@@ -76,7 +97,7 @@ class PGPExampleUtil
      */
     static PGPPublicKey readPublicKey(InputStream input) throws IOException, PGPException
     {
-        PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(
+        BcPGPPublicKeyRingCollection pgpPub = new BcPGPPublicKeyRingCollection(
             PGPUtil.getDecoderStream(input));
 
         //
@@ -123,7 +144,7 @@ class PGPExampleUtil
      */
     static PGPSecretKey readSecretKey(InputStream input) throws IOException, PGPException
     {
-        PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(
+        PGPSecretKeyRingCollection pgpSec = new JcaPGPSecretKeyRingCollection(
             PGPUtil.getDecoderStream(input));
 
         //

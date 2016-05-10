@@ -33,6 +33,7 @@ import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
 import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
 
 public class Verifier {
 
@@ -56,11 +57,11 @@ public class Verifier {
   {
     InputStream in = PGPUtil.getDecoderStream(inStream);
 
-    PGPObjectFactory            pgpFact = new PGPObjectFactory(in);
+    PGPObjectFactory            pgpFact = new JcaPGPObjectFactory(in);
 
     PGPCompressedData           c1 = (PGPCompressedData)pgpFact.nextObject();
 
-    pgpFact = new PGPObjectFactory(c1.getDataStream());
+    pgpFact = new JcaPGPObjectFactory(c1.getDataStream());
 
     PGPOnePassSignatureList     p1 = (PGPOnePassSignatureList)pgpFact.nextObject();
 
