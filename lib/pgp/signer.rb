@@ -33,7 +33,7 @@ module PGP
 
     def keyring_from_stream(stream)
       yafs = PGPUtil.get_decoder_stream(stream)
-      PGPSecretKeyRingCollection.new(yafs)
+      JcaPGPSecretKeyRingCollection.new(yafs)
     end
 
   end
