@@ -43,6 +43,18 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
+import org.bouncycastle.openpgp.jcajce.JcaPGPSecretKeyRingCollection;
+import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
+import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.PGPContentVerifierBuilderProvider;
+import org.bouncycastle.openpgp.operator.PGPDigestCalculatorProvider;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
+import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
+import org.bouncycastle.openpgp.operator.PublicKeyDataDecryptorFactory;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
 
 public class Decryptor {
 
@@ -77,7 +89,15 @@ public class Decryptor {
       if (pgpSecKey == null)
         return null;
 
-      return pgpSecKey.extractPrivateKey((passphrase == null ? null : passphrase.toCharArray()), "BC");
+      PGPDigestCalculatorProvider calcProvider = new JcaPGPDigestCalculatorProviderBuilder().
+        setProvider(BouncyCastleProvider.PROVIDER_NAME).
+        build();
+
+      PBESecretKeyDecryptor decryptor = new JcePBESecretKeyDecryptorBuilder(calcProvider).
+        setProvider(BouncyCastleProvider.PROVIDER_NAME).
+        build((passphrase == null ? null : passphrase.toCharArray()));
+
+      return pgpSecKey.extractPrivateKey(decryptor);
   }
 
   /** End Accessor Methods **/
@@ -97,7 +117,7 @@ public class Decryptor {
 
       InputStream decoderStream = PGPUtil.getDecoderStream(encryptedStream);
 
-      PGPObjectFactory pgpF = new PGPObjectFactory(decoderStream);
+      PGPObjectFactory pgpF = new JcaPGPObjectFactory(decoderStream);
       PGPEncryptedDataList encryptedData = null;
       Object encryptedObj = pgpF.nextObject();
       Iterator encryptedDataIterator;
@@ -127,13 +147,14 @@ public class Decryptor {
       if (privateKey == null)
         throw new IllegalArgumentException("secret key for message not found.");
 
-      decryptedDataStream = publicKeyData.getDataStream(privateKey, "BC");
+      PublicKeyDataDecryptorFactory decryptorFactory = new BcPublicKeyDataDecryptorFactory(privateKey);
+      decryptedDataStream = publicKeyData.getDataStream(decryptorFactory);
 
-      pgpFactory = new PGPObjectFactory(decryptedDataStream);
+      pgpFactory = new JcaPGPObjectFactory(decryptedDataStream);
 
       compressedData = (PGPCompressedData) pgpFactory.nextObject();
 
-      pgpFactory = new PGPObjectFactory(compressedData.getDataStream());
+      pgpFactory = new JcaPGPObjectFactory(compressedData.getDataStream());
 
       literallyTheRealFuckingData = (PGPLiteralData) pgpFactory.nextObject();
 

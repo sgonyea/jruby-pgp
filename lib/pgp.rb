@@ -1,6 +1,6 @@
 require 'java'
-require 'pgp/jars/bcprov-jdk15on-147.jar'
-require 'pgp/jars/bcpg-jdk15on-147.jar'
+require 'pgp/jars/bcprov-jdk15on-153.jar'
+require 'pgp/jars/bcpg-jdk15on-153.jar'
 require 'pgp/jruby-pgp.jar'
 
 require 'pgp/decryptor'

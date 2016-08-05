@@ -1,6 +1,7 @@
 module PGP
   class Decryptor < org.sgonyea.pgp.Decryptor
     include_package "org.bouncycastle.openpgp"
+    include_package "org.bouncycastle.openpgp.jcajce"
 
     def add_keys(key_string)
       self.private_keys = keyring_from_string(key_string)
@@ -33,7 +34,7 @@ module PGP
 
     def keyring_from_stream(stream)
       yafs = PGPUtil.get_decoder_stream(stream)
-      PGPSecretKeyRingCollection.new(yafs)
+      JcaPGPSecretKeyRingCollection.new(yafs)
     end
 
   end
